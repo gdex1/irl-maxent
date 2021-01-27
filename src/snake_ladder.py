@@ -168,47 +168,47 @@ class SnakeLadderWorld:
 
 
 
-def state_features(world):
-    """
-    Return the feature matrix assigning each state with an individual
-    feature (i.e. an identity matrix of size n_states * n_states).
+    def state_features(self):
+        """
+        Return the feature matrix assigning each state with an individual
+        feature (i.e. an identity matrix of size n_states * n_states).
+    
+        Rows represent individual states, columns the feature entries.
+    
+        Args:
+            world: A GridWorld instance for which the feature-matrix should be
+                computed.
+    
+        Returns:
+            The coordinate-feature-matrix for the specified world.
+        """
+        
+        NUM_FEATURES = 3
+        features = np.zeros((self.size, NUM_FEATURES))
+        features[:, 0] = np.arange(0, self.size)
 
-    Rows represent individual states, columns the feature entries.
-
-    Args:
-        world: A GridWorld instance for which the feature-matrix should be
-            computed.
-
-    Returns:
-        The coordinate-feature-matrix for the specified world.
-    """
-    return np.identity(world.n_states)
-
-
-def coordinate_features(world):
-    """
-    Symmetric features assigning each state a vector where the respective
-    coordinate indices are nonzero (i.e. a matrix of size n_states *
-    world_size).
-
-    Rows represent individual states, columns the feature entries.
-
-    Args:
-        world: A GridWorld instance for which the feature-matrix should be
-            computed.
-
-    Returns:
-        The coordinate-feature-matrix for the specified world.
-    """
-    features = np.zeros((world.n_states, world.size))
-
-    for s in range(world.n_states):
-        x, y = world.state_index_to_point(s)
-        features[s, x] += 1
-        features[s, y] += 1
-
-    return features
-
+        for s in range(self.size):
+            features[s, 1] = self._next_snake(s)
+            features[s, 2] = self._next_ladder(s)
+            
+        return features
+    
+    # Other feature ideas...length of snake and ladder links
+    def _next_snake(self, s):
+        
+        for i in range(s, self.size):
+            if self.game_board[i] < i:
+                return i - s
+            
+        return self.size + 10
+    
+    def _next_ladder(self, s):
+        
+        for i in range(s, self.size):
+            if self.game_board[i] > i:
+                return i - s
+            
+        return self.size + 10
 
 
 
