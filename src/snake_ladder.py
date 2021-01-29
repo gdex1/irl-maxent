@@ -194,6 +194,8 @@ class SnakeLadderWorld:
         return features
     
     # Other feature ideas...length of snake and ladder links
+    # Number of snakes/ladders in range for each move
+    # Total amount of "damage" or "gain" in dice range role
     def _next_snake(self, s):
         
         for i in range(s, self.size):
