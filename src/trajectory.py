@@ -79,7 +79,7 @@ def generate_trajectory(world, policy, start, final):
         next_s = range(world.n_states)
         next_p = world.p_transition[state, :, action]
 
-        next_state = np.random.choice(next_s, p=next_p)
+        next_state = np.random.choice(next_s, p=next_p.flatten())
 
         trajectory += [(state, action, next_state)]
         state = next_state
