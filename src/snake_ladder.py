@@ -190,6 +190,12 @@ class SnakeLadderWorld:
         for s in range(self.size):
             features[s, 1] = self._next_snake(s)
             features[s, 2] = self._next_ladder(s)
+        
+        ## Normalize features
+        features +=  np.ones((self.size, 3))
+        features /= features.max()
+        features = np.log(features)
+        features +=  np.ones((self.size, 3))
             
         return features
     

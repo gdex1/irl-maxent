@@ -23,6 +23,8 @@ def setup_mdp():
     """
     # create our world
     world = W.SnakeLadderWorld(size=20, shortcut_density=0.1)
+    print("Game Board:")
+    print(world.game_board)
 
     # set up the reward function
     reward = np.zeros(world.n_states)
@@ -99,9 +101,10 @@ def main():
     trajectories = list(T.generate_trajectories(5, world, policy, start, terminal))
 
     # return trajectories
+    print('Starting MaxEnt')
 
     # maximum entropy reinforcement learning (non-causal)
-    reward_maxent = maxent(world, terminal, trajectories)
+    # reward_maxent = maxent(world, terminal, trajectories)
 
     # maximum casal entropy reinforcement learning (non-causal)
     reward_maxcausal = maxent_causal(world, terminal, trajectories)
