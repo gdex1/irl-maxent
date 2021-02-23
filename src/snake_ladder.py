@@ -170,9 +170,6 @@ class SnakeLadderWorld:
 
     def state_features(self):
         """
-        Return the feature matrix assigning each state with an individual
-        feature (i.e. an identity matrix of size n_states * n_states).
-    
         Rows represent individual states, columns the feature entries.
     
         Args:
@@ -196,6 +193,8 @@ class SnakeLadderWorld:
         features /= features.max()
         features = np.log(features)
         features +=  np.ones((self.size, 3))
+        
+        print(features)
             
         return features
     

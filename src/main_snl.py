@@ -104,12 +104,12 @@ def main():
     print('Starting MaxEnt')
 
     # maximum entropy reinforcement learning (non-causal)
-    # reward_maxent = maxent(world, terminal, trajectories)
+    reward_maxent = maxent(world, terminal, trajectories)
 
     # maximum casal entropy reinforcement learning (non-causal)
-    reward_maxcausal = maxent_causal(world, terminal, trajectories)
+    # reward_maxcausal = maxent_causal(world, terminal, trajectories)
 
-    print(reward_maxcausal)
+    print(reward_maxent)
 
 if __name__ == '__main__':
     main()
