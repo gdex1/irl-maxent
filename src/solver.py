@@ -179,3 +179,32 @@ def stochastic_policy_from_value(world, value, w=lambda x: x):
     ])
 
     return policy / np.sum(policy, axis=1)[:, None]
+
+def stochastic_policy_from_value_expectation(world, value):
+    """
+    Compute a stochastic policy from the given value function. 
+    Instead of using the value we would obtain of a single state s' after taking a in s,
+    we use the expectation of the value over the distribution of s' in the case we have a stochastic environment
+
+    Args:
+        world: The `GridWorld` instance for which the the policy should be
+            computed.
+        value: The value-function dictating the policy as table
+            `[state: Integer] -> value: Float`
+
+    Returns:
+        The stochastic policy given the provided arguments as table
+        `[state: Integer, action: Integer] -> probability: Float`
+        describing a probability distribution p(action | state) of selecting
+        an action given a state.
+    """
+    transition_table = world._transition_prob_table()
+    
+    # calculate expected value for each action in each state
+    policy = np.array([
+        value.dot(transition_table[s,:,:])
+        for s in range(world.n_states)
+    ])
+
+    # convert to probabilities and return
+    return policy / np.sum(policy, axis=1)[:, None] 
