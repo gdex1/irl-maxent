@@ -26,10 +26,7 @@ import random
 
 class SnakeLadderWorld:
     """
-    Basic deterministic grid world MDP.
-
-    The attribute size specifies both widht and height of the world, so a
-    world will have size**2 states.
+    1-Player Snake and Ladder Game MDP.
 
     Args:
         size: Length of the board.
@@ -193,9 +190,9 @@ class SnakeLadderWorld:
         features +=  np.ones((self.size, 3))
         features /= features.max()
         features = np.log(features)
-        features +=  np.ones((self.size, 3))
+        # features +=  np.ones((self.size, 3))
         
-        print(features)
+        # print(features)
             
         return features
     
