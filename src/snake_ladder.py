@@ -21,14 +21,12 @@ supplied separately.
 
 import numpy as np
 from itertools import product
+import random
 
 
 class SnakeLadderWorld:
     """
-    Basic deterministic grid world MDP.
-
-    The attribute size specifies both widht and height of the world, so a
-    world will have size**2 states.
+    1-Player Snake and Ladder Game MDP.
 
     Args:
         size: Length of the board.
@@ -170,9 +168,6 @@ class SnakeLadderWorld:
 
     def state_features(self):
         """
-        Return the feature matrix assigning each state with an individual
-        feature (i.e. an identity matrix of size n_states * n_states).
-    
         Rows represent individual states, columns the feature entries.
     
         Args:
@@ -195,7 +190,9 @@ class SnakeLadderWorld:
         features +=  np.ones((self.size, 3))
         features /= features.max()
         features = np.log(features)
-        features +=  np.ones((self.size, 3))
+        # features +=  np.ones((self.size, 3))
+        
+        # print(features)
             
         return features
     
@@ -217,6 +214,28 @@ class SnakeLadderWorld:
                 return i - s
             
         return self.size + 10
+    
+    def _worst_outcome_one_dice(self, s):
+        return min(self.game_board[s:s+6])
+
+    def _best_outcome_one_dice(self, s):
+        return max(self.game_board[s:s+6])
+
+    def _worst_outcome_two_dice(self, s):
+        return min(self.game_board[s:s+12])
+
+    def _best_outcome_two_dice(self, s):
+        return max(self.game_board[s:s+12])
+
+    def _smartish_policy(self, s):
+        out = {}
+        out[0] = self.game_board[s + 1]
+        out[1] = self._best_outcome_one_dice(s) - self._worst_outcome_one_dice(s)
+        out[2] = self._best_outcome_two_dice(s) - self._worst_outcome_two_dice(s)
+        if random.uniform(0, 1) < 0.1:
+            return random.choice(list(out.keys()))
+        return max(out, key=out.get)
+
 
 
 

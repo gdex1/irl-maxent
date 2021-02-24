@@ -250,6 +250,9 @@ def irl(p_transition, features, terminal, trajectories, optim, init, eps=1e-4, e
         # perform optimization step and compute delta for convergence
         optim.step(grad)
         delta = np.max(np.abs(theta_old - theta))
+        
+    # print("Theta equals:")
+    # print(theta)
 
     # re-compute per-state reward and return
     return features.dot(theta)
@@ -448,6 +451,7 @@ def irl_causal(p_transition, features, terminal, trajectories, optim, init, disc
         # perform optimization step and compute delta for convergence
         optim.step(grad)
         delta = np.max(np.abs(theta_old - theta))
-
+    # print("Theta equals:")
+    # print(theta)
     # re-compute per-state reward and return
     return features.dot(theta)
