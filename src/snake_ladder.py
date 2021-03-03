@@ -169,36 +169,34 @@ class SnakeLadderWorld:
     def state_features(self):
         """
         Rows represent individual states, columns the feature entries.
-    
-        Args:
-            world: A GridWorld instance for which the feature-matrix should be
-                computed.
-    
+      
         Returns:
             The coordinate-feature-matrix for the specified world.
         """
         
-        NUM_FEATURES = 3
-        features = np.zeros((self.size, NUM_FEATURES))
-        features[:, 0] = np.arange(0, self.size)
+        
+        feature_vector_list = []
+        feature_vector_list.append(np.arange(0, self.size))
+        
+        # Put feature functions in this list to include in the MaxEnt method
+        # Not including all features to see how it affects the model
+        feature_function_list = [self._next_snake, self._next_ladder, self._worst_outcome_one_dice,
+                                 self._worst_outcome_one_dice]
 
-        for s in range(self.size):
-            features[s, 1] = self._next_snake(s)
-            features[s, 2] = self._next_ladder(s)
+        for func in feature_function_list:
+            func = np.vectorize(func)
+            feature_vector_list.append(func(np.arange(self.size)))
+        
+        features = np.vstack(feature_vector_list).T
         
         ## Normalize features
-        features +=  np.ones((self.size, 3))
+        features =  features + np.ones(features.shape)
         features /= features.max()
         features = np.log(features)
-        # features +=  np.ones((self.size, 3))
-        
-        # print(features)
             
         return features
-    
-    # Other feature ideas...length of snake and ladder links
-    # Number of snakes/ladders in range for each move
-    # Total amount of "damage" or "gain" in dice range role
+
+
     def _next_snake(self, s):
         
         for i in range(s, self.size):
@@ -235,6 +233,7 @@ class SnakeLadderWorld:
         if random.uniform(0, 1) < 0.1:
             return random.choice(list(out.keys()))
         return max(out, key=out.get)
+
 
 
 
