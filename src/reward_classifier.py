@@ -68,7 +68,7 @@ def execute_maxent_causal(world, terminal, trajectories, discount=0.7):
 
 world = SnakeLadderWorld(size=BOARD_SIZE, shortcut_density=SHORTCUT_DENSITY)
 
-policy_1 = lambda s: 1
+policy_1 = world.oso_policy
 policy_2 = world._smartish_policy
 
 policies = [policy_1, policy_2]

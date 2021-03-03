@@ -233,11 +233,27 @@ class SnakeLadderWorld:
         if random.uniform(0, 1) < 0.1:
             return random.choice(list(out.keys()))
         return max(out, key=out.get)
-
-
-
-
-
+    
+    # Expected displacement after moving one square
+    def _expec_dist_0(self, s):
+        return self._protected_move(s, 1) - s
+    
+    # Expected displacement after rolling 1 die
+    def _expec_dist_1(self, s):
+        end_states = [self._protected_move(s, d) for d in range(1,7)]
+        return (1/6)*sum(end_states) - s
+    
+    # Expected displacement after rolling 2 dice
+    def _expec_dist_2(self, s):
+        end_states = [self._protected_move(s, d) for d in range(1,13)]
+        return (1/12)*sum(end_states) - s
+    
+    # One Step Optimal Policy 
+    def oso_policy(self, s):
+        
+        expec_list = [self._expec_dist_0, self._expec_dist_1, self._expec_dist_2]
+        expec_list = [f(s) for f in expec_list]
+        return expec_list.index(max(expec_list))
 
 
 
