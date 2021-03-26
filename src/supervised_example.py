@@ -107,9 +107,11 @@ def main():
     print(compute_class_accuracy(y_test, y_predicted))
 
     # create instance importance plot
-    trajectory_index = 7
-    fig = instance_importance_plot(x_test, y_test, trajectory_index, lstm_model, scale_constant=10)
-    fig.show()
+    for i in range(5):
+        trajectory_index = i
+        fig = instance_importance_plot(x_test, y_test, trajectory_index, lstm_model, scale_constant=10)
+        fig.show()
+ 
 
 
 if __name__ == "__main__":
