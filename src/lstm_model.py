@@ -21,15 +21,18 @@ class LstmModel(SupervisedModel):
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=metrics)
 
-    def train(self, x_train, y_train, x_test, y_test, log_dir = None, epochs = 100, batch_size = 32):
+    def train(self, x_train, y_train, x_test, y_test, log_dir = None, epochs = 100, batch_size = 32, early_stopping=False, patience=1):
+        callbacks = []
         if log_dir is not None:
             log_dir = os.path.join(log_dir, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
             tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-        else:
-            tensorboard_callback = None
+            callbacks.append(tensorboard_callback)
+        if early_stopping:
+            early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, mode='min', restore_best_weights=True)
+            callbacks.append(early_stopping)
         
         self.model.fit(x_train,y_train, epochs=epochs, batch_size=batch_size, 
-                       validation_data=(x_test,y_test), callbacks=[tensorboard_callback])
+                       validation_data=(x_test,y_test), callbacks=callbacks)
 
     # both functions expect x to be TensorShape([# samples, None, None]), so 1 trajectory should be 3 dimensional TensorShape([1, None, None])
     def predict(self, x):

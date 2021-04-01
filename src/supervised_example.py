@@ -3,44 +3,12 @@ import numpy as np
 from trajectory import Trajectory, generate_trajectory, generate_trajectories, stochastic_policy_adapter
 from solver import value_iteration, stochastic_policy_from_value_expectation
 from snake_ladder import SnakeLadderWorld
-from supervised_utils import trajectory_list_to_xy, shuffle, x_to_ragged, train_test_split, compute_class_accuracy, sigmoid
+from supervised_utils import trajectory_list_to_xy, shuffle, x_to_ragged, train_test_split, compute_class_accuracy, sigmoid, get_fixed_policies, get_expert_policy, generate_trajectories_from_policy_list
 import tensorflow as tf
 from lstm_model import LstmModel
 import plotly.express as px
 import datetime
 from importance import calc_instance_score, instance_importance_plot
-
-def get_fixed_policies(success_prob = .9):
-    policies_fixed = []
-    for i in range(3):
-        def policy(state, action = i):
-            if success_prob >= np.random.uniform():
-                return action
-            else:
-                return np.random.choice(3)
-    policies_fixed.append(policy)
-    return policies_fixed
-
-def get_expert_policy(world,  discount = .7, weighting = lambda x: x):
-    # set up the reward function
-    reward = np.zeros(world.n_states)
-    reward[-1] = 1.0
-
-    value = value_iteration(world.p_transition, reward, discount)
-    policy = stochastic_policy_from_value_expectation(world, value)
-    policy_exec = stochastic_policy_adapter(policy)
-    return policy_exec
-
-def generate_trajectories_from_policy_list(world, policy_list, n_trajectories_per_policy = 100):
-    start = [0]
-    terminal = [world.size - 1]
-
-    trajectories_list = []
-    for i, policy in enumerate(policy_list):
-        trajectories = list(generate_trajectories(n_trajectories_per_policy, world, policy_list[i], start, terminal))
-        trajectories = [t._t for t in trajectories]
-        trajectories_list.append(trajectories)
-    return trajectories_list
 
 def main():
     # define some consants
@@ -73,7 +41,7 @@ def main():
 
     # generate trajectories for all policies
     # each index of list contains array of corresponding policy trajectories
-    n_trajectories_per_policy = 500
+    n_trajectories_per_policy = 1000
     trajectories_list = generate_trajectories_from_policy_list(world, policies,n_trajectories_per_policy=n_trajectories_per_policy)
 
     # print an example trajectory
@@ -100,7 +68,7 @@ def main():
 
     # train model
     lstm_model.train(x_train, y_train, x_test, y_test, log_dir="./logs/fit/", 
-                     epochs = 100, batch_size=int(n_trajectories_per_policy / 10))
+                     epochs = 500, batch_size=int(n_trajectories_per_policy / 10), early_stopping=True,patience=10)
 
     # compute accuracy by class
     y_predicted = lstm_model.predict_classes(x_test)
@@ -111,7 +79,7 @@ def main():
         trajectory_index = i
         fig = instance_importance_plot(x_test, y_test, trajectory_index, lstm_model, scale_constant=10)
         fig.show()
- 
+    
 
 
 if __name__ == "__main__":
