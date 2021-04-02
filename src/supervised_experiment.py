@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     # test with one world
     # define some consants
-    world_size = 20
+    world_size = 30
     shortcut_density = 0.1
   
     # create our worlds
@@ -102,13 +102,13 @@ if __name__ == "__main__":
     # save to numpy file
     class_accuracies = np.vstack(class_accuracies)
     description = 'binary-expert-smart'
-    file_name = f'{description}_policies_{n_policies}_worlds_{n_worlds}_trials_{n_trials}'
+    file_name = f'{description}_policies_{n_policies}_worlds_{n_worlds}_trials_{n_trials}_size_{world_size}_density_{shortcut_density}'
     #np.save(os.path.join('experiments', file_name), class_accuracies)
 
-    np.split(array, 7,axis=0)
+    #np.split(array, len(num_list),axis=0)
     # convert to dictionary
     accuracy_dictionary = {}
-    for index, arr in enumerate(np.split(array, len(num_list),axis=0)):
+    for index, arr in enumerate(np.split(class_accuracies, len(num_list),axis=0)):
         accuracy_dictionary[num_list[index]] = arr
     # write to file
     pickle.dump(accuracy_dictionary, open(file_name, "wb"))
