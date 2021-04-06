@@ -111,6 +111,6 @@ if __name__ == "__main__":
     for index, arr in enumerate(np.split(class_accuracies, len(num_list),axis=0)):
         accuracy_dictionary[num_list[index]] = arr
     # write to file
-    pickle.dump(accuracy_dictionary, open(file_name, "wb"))
+    pickle.dump(accuracy_dictionary, open(os.path.join('experiments', file_name), "wb"))
     
     
