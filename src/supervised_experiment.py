@@ -40,7 +40,7 @@ def experiment_train_test(world, n_train_samples, n_test_samples, policies):
     lstm_model = LstmModel(max_trajectory_len=max_seq, num_features=3, num_outputs=len(policies))
 
     # train with large number of epochs, but with early stopping
-    lstm_model.train(x_train, y_train, x_test, y_test, epochs = 500, 
+    lstm_model.train(x_train, y_train, x_test, y_test, epochs = 5, 
                      batch_size=int(n_train_samples_per_policy / 10), early_stopping=True, patience=5)
 
     y_predicted = lstm_model.predict_classes(x_test)
@@ -52,7 +52,7 @@ def experiment_train_test(world, n_train_samples, n_test_samples, policies):
 
 if __name__ == "__main__":
     # number of trials for each num_trajectories
-    n_trials = 10
+    n_trials = 1
 
     # test with one world
     # define some consants
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     shortcut_density = 0.1
   
     # create our worlds
-    n_worlds = 10
+    n_worlds = 1
     worlds = []
     for i in range(n_worlds):
         world = SnakeLadderWorld(size=world_size, shortcut_density=shortcut_density)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # save to numpy file
     class_accuracies = np.vstack(class_accuracies)
     description = 'binary-expert-smart'
-    file_name = f'{description}_policies_{n_policies}_worlds_{n_worlds}_trials_{n_trials}_size_{world_size}_density_{shortcut_density}'
+    file_name = f'{description}_policies_{n_policies}_worlds_{n_worlds}_trials_{n_trials}_size_{world_size}_density_{int(shortcut_density*100)}'
     #np.save(os.path.join('experiments', file_name), class_accuracies)
 
     #np.split(array, len(num_list),axis=0)
@@ -112,5 +112,10 @@ if __name__ == "__main__":
         accuracy_dictionary[num_list[index]] = arr
     # write to file
     pickle.dump(accuracy_dictionary, open(os.path.join('experiments', file_name), "wb"))
+    # write worlds to file
+    world_file = open(os.path.join('experiments', f'worlds_{file_name}'),'w')
+    for world in worlds:
+        world_file.write(str(world.game_board))
+    world_file.close()
     
     
