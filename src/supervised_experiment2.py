@@ -80,39 +80,48 @@ def experiment_train_test(n_train_samples, n_test_samples, world_size, shortcut_
 if __name__ == "__main__":
     # number of trials for each num_trajectories
     n_trials = 10
-    num_worlds_per_size = 30
+    num_worlds_per_size = 10
 
     # test with one world
     # define some consants
-    shortcut_density = 0.1
+    constant_shortcut_density = 0.1
+    constant_world_size = 20
+
     n_policies = 2
 
     n_test_samples = 500
     n_train_samples = 200
-    def experiment_train_test_wrapper(world_size):
-        return experiment_train_test(n_train_samples, n_test_samples, world_size, shortcut_density, num_worlds_per_size) 
+    def experiment_train_test_wrapper_ws(world_size):
+        return experiment_train_test(n_train_samples, n_test_samples, world_size, constant_shortcut_density, num_worlds_per_size)
+    def experiment_train_test_wrapper_sd(shortcut_density):
+        return experiment_train_test(n_train_samples, n_test_samples, constant_world_size, shortcut_density, num_worlds_per_size)  
     
     # create list of n to try
     #num_list = [20, 50, 100, 200, 400, 800, 1000]
     world_sizes = [10, 20, 30]
+    shortcut_densities = [.1, .2, .3]
 
     # create 1d arg list
     arg_list = []
-    for size in world_sizes:
+    # for size in world_sizes:
+    #     for i in range(n_trials):
+    #         arg_list.append((size))
+    
+    for s_d in shortcut_densities:
         for i in range(n_trials):
-            arg_list.append((size))
+            arg_list.append((s_d))
 
     num_workers = 6 # number of physical cores
     pool = multiprocessing.Pool(num_workers, init_worker)
 
-    #class_accuracies = pool.starmap(experiment_train_test_wrapper, arg_list)
-    class_accuracies = pool.map(experiment_train_test_wrapper, arg_list)
+    #class_accuracies = pool.starmap(experiment_train_test_wrapper_ws, arg_list)
+    class_accuracies = pool.map(experiment_train_test_wrapper_sd, arg_list)
 
 
     print(class_accuracies)
     # save to numpy file
     class_accuracies = np.vstack(class_accuracies)
-    description = 'binary-expert-smart-sizes'
+    description = 'binary-expert-smart-densities'
     world_str = str(world_sizes).replace(' ','')
     file_name = f'{description}_policies_{n_policies}_worlds_{world_str}_numWorlds_{num_worlds_per_size}_trials_{n_trials}_density_{int(shortcut_density*100)}'
     #np.save(os.path.join('experiments', file_name), class_accuracies)
@@ -120,8 +129,11 @@ if __name__ == "__main__":
     #np.split(array, len(num_list),axis=0)
     # convert to dictionary
     accuracy_dictionary = {}
-    for index, arr in enumerate(np.split(class_accuracies, len(world_sizes),axis=0)):
-        accuracy_dictionary[world_sizes[index]] = arr
+    # for index, arr in enumerate(np.split(class_accuracies, len(world_sizes),axis=0)):
+    #     accuracy_dictionary[world_sizes[index]] = arr
+
+    for index, arr in enumerate(np.split(class_accuracies, len(shortcut_densities),axis=0)):
+        accuracy_dictionary[shortcut_densities[index]] = arr
     # write to file
     pickle.dump(accuracy_dictionary, open(os.path.join('./experiments', file_name), "wb"))
 
